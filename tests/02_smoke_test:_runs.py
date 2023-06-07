@@ -5,7 +5,7 @@ from srspy import runs
 
 print("THIS IS SMOKE TEST 2: IT TESTS basics")
 
-# lightweight tests on some helpers
+# Sundry basic tests
 assert runs.DEFAULT_LOG_DIR
 
 assert runs.now_str()
