@@ -1,6 +1,5 @@
 import pytest
 import io
-from typing import IO
 
 from srspy import runs
 
@@ -27,7 +26,7 @@ class StubFile(object):
     mode: str
     closed: bool = False
     flushed: bool = True
-    buffer: IO
+    buffer: io.BytesIO
 
     def __init__(self, mode: str):
         if "w" not in mode:
@@ -51,10 +50,13 @@ class StubFile(object):
         self.closed = True
 
     def __enter__(self):
-        return self.buffer
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
+
+    def __iter__(self):
+        return self.buffer
 
 
 with pytest.raises(ValueError):
@@ -131,11 +133,34 @@ r.close()
 
 # Test 'RunTraceLog'
 
-fs = StubFS()
-r = runs.RunTrace(name="test", fs=fs)
+# fs = StubFS()
+# r = runs.RunTrace(name="test", fs=fs)
+# r.log(summary="this is a test", data={"metric": 100})
+# r.flush(summary="this will flush right after the write", data={"metric": 101})
+# r.flush(summary="this will flush right after the write", data={"metric": 102})
+# r.close()
+# fname = list(fs.files.keys())[0]
+# assert fs.open(fname, "r")
+# assert len(fs.open(fname, "r").buffer.getvalue()) > 0
+#
+# for line in fs.open(fname, "r").buffer:
+#     print("what")
+#     print(line)
+#
+# log = runs.RunTraceLog(fname, fs=fs)
+# assert log.path == fname
+# print(log.entries)
+# assert len(log.entries) == 4
+
+## use local filesystem
+r = runs.RunTrace(name="test", fs=fs, log_dir="/tmp")
 r.log(summary="this is a test", data={"metric": 100})
 r.flush(summary="this will flush right after the write", data={"metric": 101})
 r.flush(summary="this will flush right after the write", data={"metric": 102})
 r.close()
-fname = list(fs.files.keys())[0]
-log = runs.RunTraceLog(fname, fs=fs)
+fname = r.log_file_path
+print(fname)
+log = runs.RunTraceLog(fname)
+assert log.path == fname
+print(log.entries)
+assert len(log.entries) == 4

@@ -54,6 +54,7 @@ class RunTrace(object):
     _fs: FS
     closed: bool = False
     name: str
+    log_file_path: str
     log_file: File  # e.g. local file, file-like, spin file
 
     def __init__(
@@ -133,7 +134,9 @@ class RunTraceLog(object):
         self.entries = []
 
         with fs.open(self.path, "r") as file:
+            print(f"in open, file={file}")
             for line in file:
+                print(f"in loop, line={line.decode('utf-8')}")
                 j = json.loads(line)
                 self.entries.append(LogEntry.from_json(j))
 
