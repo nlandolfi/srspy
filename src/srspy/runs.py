@@ -27,7 +27,7 @@ class FS(Protocol):
         ...
 
 
-# A type-hint interface for file system methods required.
+# A type-hint interface for File methods required.
 class File(Protocol):
     def write(self, bytes):
         ...
@@ -48,7 +48,7 @@ class LocalFS(object):
 
 class RunTrace(object):
     """
-    RunTrace is a class for logging information about an experiment run.
+    RunTrace is a class for logging information about an experiment.
     """
 
     _fs: FS
@@ -61,7 +61,7 @@ class RunTrace(object):
         name: str = "",
         log_dir: str = "",
         data: dict = {},
-        fs: FS = LocalFS(),
+        fs: FS = LocalFS,
         verbose=False,
     ):
         if name == "":
