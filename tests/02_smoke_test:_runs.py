@@ -81,10 +81,10 @@ class StubFS(object):
 
 
 fs = StubFS()
-assert len(f.files) == 0
-f.open("one", "wb")
-f.open("two", "wb")
-assert len(f.files) == 2
+assert len(fs.files) == 0
+fs.open("one", "wb")
+fs.open("two", "wb")
+assert len(fs.files) == 2
 
 ## Test RunTrace
 
