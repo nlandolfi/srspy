@@ -8,11 +8,11 @@ pip install srspy
 
 For example,
 ```python
-import srspy as srs
+from srspy import RunTrace
 
 # ...
 
-r = srs.RunTrace(name="train_model", data={
+r = RunTrace(name="train_model", data={
     "epochs": epochs,
     "batch_size": batch_size,
     "p": p,

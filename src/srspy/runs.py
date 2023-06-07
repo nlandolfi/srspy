@@ -3,17 +3,23 @@ from typing import IO
 import datetime
 import json
 import os
-import uuid as uuidpkg
+import uuid
 
 
-from .records import LogEntry, LogEntryLog, LogEntryClose
+from .records import LogEntry, LogEntryType, LogEntryLog, LogEntryClose
 
 # default dir to use; override via RunTrace(..., log_dir=<here>, ...)
 DEFAULT_LOG_DIR: str = "../runs/"
 
 
-# get the time as a string that we can use as a path (no spaces)
 def now_str():
+    """
+    A helper function to get the current time as a string that
+    we can use as a path (e.g., it has no spaces).
+
+    This function is a helper to `RunTrace.__init__` below
+
+    """
     return str(datetime.datetime.now()).replace(" ", "_")
 
 
@@ -39,15 +45,21 @@ class RunTraceLog(object):
 class RunTrace(object):
     closed: bool = False
     name: str
-    log_file: IO[bytes]  # file
+    log_file: IO[bytes]  # e.g. local file, file-like, spin file
 
-    def __init__(self, name=None, data={}, log_dir=None, fs=None, verbose=False):
-        if name is None:
+    def __init__(
+        self,
+        name: str = "",
+        log_dir: str = "",
+        data: dict = {},
+        fs=None,
+        verbose=False,
+    ):
+        if name == "":
             raise ValueError("RunTrace.init: name must be set")
-        self.name = self
+        self.name = name
 
-        # log directory
-        if log_dir is None:
+        if log_dir == "":
             log_dir = DEFAULT_LOG_DIR
         self.log_dir = log_dir
 
@@ -66,7 +78,7 @@ class RunTrace(object):
 
         self.log(summary=f"{name} {now_str()}", data=data)
 
-    def log(self, summary="", data={}, type=LogEntryLog):
+    def log(self, summary: str = "", data: dict = {}, type: LogEntryType = LogEntryLog):
         if self.closed:
             raise Exception("RunTrace.log: called on closed log")
 
@@ -74,7 +86,7 @@ class RunTrace(object):
             LogEntry(
                 type=type,
                 time=datetime.datetime.now(),
-                uuid=uuidpkg.uuid4(),
+                uuid=uuid.uuid4(),
                 summary=summary,
                 data=data,
             ).to_json(),
@@ -82,14 +94,14 @@ class RunTrace(object):
         self.log_file.write(bytes(s, "utf-8"))
         self.log_file.write(b"\n")
 
-    def flush(self, summary="", data={}):
+    def flush(self, summary: str = "", data: dict = {}):
         if self.closed:
             raise Exception("RunTrace.flush: called on closed log")
 
         self.log(summary=summary, data=data)
         self.log_file.flush()
 
-    def close(self, summary="", data={}):
+    def close(self, summary: str = "", data: dict = {}):
         if self.closed:
             raise Exception("RunTrace.close: called on closed log")
 
