@@ -19,6 +19,9 @@ assert runs.LocalFS.open("/dev/null")  # basic open
 
 
 # Some stubs for the file system stuff.
+
+## File stub
+
 class StubFile(object):
     mode: str
     closed: bool = False
@@ -61,6 +64,8 @@ f = StubFile("wb")
 f.write(b"asdf")
 
 
+## FS stubs
+
 class StubFS(object):
     files: dict
 
@@ -79,6 +84,7 @@ f.open("one", "wb")
 f.open("two", "wb")
 assert len(f.files) == 2
 
+## Test RunTrace
 
 with pytest.raises(ValueError):
     runs.RunTrace()  # lacks name
