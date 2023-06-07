@@ -1,8 +1,7 @@
-# simple logging for experiment runs; see tests/*.py for examples
 import dataclasses
 import datetime
 import json
-import uuid as uuidpkg
+import uuid as uuidpkg  # to avoid conflict with uuid type annotation below
 
 from dateutil.parser import isoparse
 
@@ -14,7 +13,7 @@ ZeroTime: datetime.datetime = datetime.datetime(
 # ZeroUUID is the zero UUID used for UUID types.
 ZeroUUID: uuidpkg.UUID = uuidpkg.UUID(int=0)
 
-# A helper type for the LogEntryType enum.
+# A helper enum type; see values below.
 LogEntryType = str
 
 # Various values for LogEntryType
