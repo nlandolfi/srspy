@@ -1,5 +1,6 @@
 import pytest
 import io
+from typing import IO
 
 from srspy import runs
 
@@ -22,6 +23,7 @@ class StubFile(object):
     mode: str
     closed: bool = False
     flushed: bool = True
+    buffer: IO
 
     def __init__(self, mode: str):
         self.mode = mode
