@@ -25,7 +25,7 @@ LogEntryClose: LogEntryType = "close"
 @dataclasses.dataclass
 class LogEntry:
     """
-    LogEntry is struct-like class for serializing log entries.
+    LogEntry is a struct-like class for serializing log entries.
 
     Note: the field data below is serialized to 'DataJSON'.
     """
