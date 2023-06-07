@@ -21,7 +21,7 @@ def now_str():
     return str(datetime.datetime.now()).replace(" ", "_")
 
 
-# A type-hint interface for file system methods required.
+# A type-hint interface for a file system.
 class FS(Protocol):
     def open(self, name: str, mode: str = "wb") -> IO[bytes]:
         ...
