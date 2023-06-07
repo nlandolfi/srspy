@@ -17,10 +17,7 @@ types:
 	mypy src
 test:
 	python tests/01_smoke_test:_records.py
-<<<<<<< HEAD
 	python tests/02_smoke_test:_basics.py
-=======
->>>>>>> main
 freeze:
 	pip freeze > requirements.txt
 
