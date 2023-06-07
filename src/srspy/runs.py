@@ -1,5 +1,5 @@
 # simple logging for experiment runs; see tests/*.py for examples
-from typing import IO, Protocol
+from typing import IO, List, Protocol
 import datetime
 import json
 import os
@@ -117,3 +117,29 @@ class RunTrace(object):
         self.log_file.flush()
         self.log_file.close()
         self.closed = True
+
+
+class RunTraceLog(object):
+    """
+    'RunTraceLog' is a helper class to load into memory an
+    entire 'RunTrace' log which has *already* been written.
+    """
+
+    path: str
+    entries: List[LogEntry]
+
+    def __init__(self, path, fs: FS = LocalFS):
+        self.path = path
+        self.entries = []
+
+        with fs.open(self.path, "r") as file:
+            for line in file:
+                j = json.loads(line)
+                self.entries.append(LogEntry.from_json(j))
+
+    def metric(self, name: str):
+        out = []
+        for entry in self.entries:
+            if name in entry.data:
+                out.append(entry.data[name])
+        return out
