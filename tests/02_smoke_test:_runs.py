@@ -64,7 +64,7 @@ f = StubFile("wb")
 f.write(b"asdf")
 
 
-## FS stubs
+## FS stub
 
 class StubFS(object):
     files: dict
