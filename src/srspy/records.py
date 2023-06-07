@@ -25,10 +25,11 @@ LogEntryClose: LogEntryType = "close"
 @dataclasses.dataclass
 class LogEntry:
     """
-    LogEntry is struct-like class for log entries.
+    LogEntry is struct-like class for serializing log entries.
 
     Note: the field data below is serialized to 'DataJSON'.
     """
+
     type: LogEntryType = LogEntryUnknown
     time: datetime.datetime = ZeroTime
     uuid: uuidpkg.UUID = ZeroUUID
