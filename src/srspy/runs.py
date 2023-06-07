@@ -29,7 +29,7 @@ class FS(Protocol):
 
 # A type-hint interface for a file.
 class File(Protocol):
-    def write(self, bytes):
+    def write(self, b: bytes):
         ...
 
     def flush(self):
