@@ -102,14 +102,17 @@ class RunTrace(object):
         if self.closed:
             raise Exception("RunTrace.flush: called on closed log")
 
-        self.log(summary=summary, data=data)
+        if summary != "" or data != {}:
+            self.log(summary=summary, data=data)
+
         self.log_file.flush()
 
     def close(self, summary: str = "", data: dict = {}):
         if self.closed:
             raise Exception("RunTrace.close: called on closed log")
 
-        self.log(summary=summary, data=data, type=LogEntryClose)
+        if summary != "" or data != {}:
+            self.log(summary=summary, data=data, type=LogEntryClose)
         self.log_file.flush()
         self.log_file.close()
         self.closed = True
