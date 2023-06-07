@@ -5,7 +5,6 @@ import json
 import os
 import uuid
 
-
 from .records import LogEntry, LogEntryType, LogEntryLog, LogEntryClose
 
 # default dir to use; override via RunTrace(..., log_dir=<here>, ...)
