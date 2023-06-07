@@ -1,4 +1,5 @@
-# srspy
+srspy
+-----
 
 A package for simple research experiment tracing. Python 3.
 
