@@ -21,15 +21,15 @@ def now_str():
     return str(datetime.datetime.now()).replace(" ", "_")
 
 
-# A type-hint interface for file system methods required.
+# A type-hint interface for a file system.
 class FS(Protocol):
     def open(self, name: str, mode: str = "wb") -> IO[bytes]:
         ...
 
 
-# A type-hint interface for File methods required.
+# A type-hint interface for a file.
 class File(Protocol):
-    def write(self, bytes):
+    def write(self, b: bytes):
         ...
 
     def flush(self):
@@ -65,7 +65,7 @@ class RunTrace(object):
         verbose=False,
     ):
         if name == "":
-            raise ValueError("RunTrace.init: name must be set")
+            raise ValueError("RunTrace.init: must provide keyword argument `name`")
         self.name = name
 
         if log_dir == "":
@@ -79,7 +79,7 @@ class RunTrace(object):
             print(f"RunTrace.init at path: {self.log_file_path}")
 
         self._fs = fs
-        self.log_file = fs.open(self.log_file_path, "wb")
+        self.log_file = self._fs.open(self.log_file_path, "wb")
         self.log(summary=f"{name} {now_str()}", data=data)
 
     def log(self, summary: str = "", data: dict = {}, type: LogEntryType = LogEntryLog):
@@ -102,14 +102,18 @@ class RunTrace(object):
         if self.closed:
             raise Exception("RunTrace.flush: called on closed log")
 
-        self.log(summary=summary, data=data)
+        if summary != "" or data != {}:
+            self.log(summary=summary, data=data)
+
         self.log_file.flush()
 
     def close(self, summary: str = "", data: dict = {}):
         if self.closed:
             raise Exception("RunTrace.close: called on closed log")
 
-        self.log(summary=summary, data=data, type=LogEntryClose)
+        if summary != "" or data != {}:
+            self.log(summary=summary, data=data, type=LogEntryClose)
+
         self.log_file.flush()
         self.log_file.close()
         self.closed = True

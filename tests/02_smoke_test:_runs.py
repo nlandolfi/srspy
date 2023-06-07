@@ -1,34 +1,42 @@
 import pytest
 import io
+from typing import IO
 
 from srspy import runs
 
 print("THIS IS SMOKE TEST 2: IT TESTS basics")
 
-# lightweight tests on some helpers
+# Sundry basic tests
 assert runs.DEFAULT_LOG_DIR
 
 assert runs.now_str()
 assert " " not in runs.now_str()  # doesn't have spaces
 
+assert runs.File
 assert runs.FS
 assert runs.LocalFS
 assert runs.LocalFS.open("/dev/null")  # basic open
 
 
 # Some stubs for the file system stuff.
+
+## File stub
+
+
 class StubFile(object):
     mode: str
     closed: bool = False
     flushed: bool = True
+    buffer: IO
 
     def __init__(self, mode: str):
+        if "w" not in mode:
+            raise ValueError("StubFile: mode not writable")
+
         self.mode = mode
         self.buffer = io.BytesIO()
 
     def write(self, bs: bytes):
-        if "w" not in self.mode:
-            raise Exception("StubFile: mode not writable")
         if self.closed:
             raise Exception("StubFile: write on closed file")
 
@@ -43,6 +51,23 @@ class StubFile(object):
         self.closed = True
 
 
+with pytest.raises(ValueError):
+    StubFile("asdf")  # mode does not have w
+
+with pytest.raises(Exception):
+    f = StubFile("wb")
+    assert f.closed
+    f.write()  # file closed
+
+assert StubFile("wb").flushed
+
+f = StubFile("wb")
+f.write(b"asdf")
+
+
+## FS stub
+
+
 class StubFS(object):
     files: dict
 
@@ -54,6 +79,14 @@ class StubFS(object):
         self.files[path] = file
         return file
 
+
+fs = StubFS()
+assert len(fs.files) == 0
+fs.open("one", "wb")
+fs.open("two", "wb")
+assert len(fs.files) == 2
+
+## Test RunTrace
 
 with pytest.raises(ValueError):
     runs.RunTrace()  # lacks name
