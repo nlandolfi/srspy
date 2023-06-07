@@ -22,6 +22,7 @@ assert runs.LocalFS.open("/dev/null")  # basic open
 
 ## File stub
 
+
 class StubFile(object):
     mode: str
     closed: bool = False
@@ -65,6 +66,7 @@ f.write(b"asdf")
 
 
 ## FS stub
+
 
 class StubFS(object):
     files: dict
