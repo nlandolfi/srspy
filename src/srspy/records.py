@@ -27,7 +27,7 @@ class LogEntry:
     """
     LogEntry is a struct-like class for serializing log entries.
 
-    Note: the field data below is serialized to 'DataJSON'.
+    Note: the `data` field below is serialized to 'DataJSON'.
     """
 
     type: LogEntryType = LogEntryUnknown
