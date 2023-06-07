@@ -50,6 +50,12 @@ class StubFile(object):
     def close(self):
         self.closed = True
 
+    def __enter__(self):
+        return self.buffer
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
 
 with pytest.raises(ValueError):
     StubFile("asdf")  # mode does not have w
@@ -75,6 +81,9 @@ class StubFS(object):
         self.files = {}
 
     def open(self, path, mode):
+        if path in self.files:
+            return self.files[path]
+
         file = StubFile(mode)
         self.files[path] = file
         return file
@@ -117,3 +126,16 @@ r = runs.RunTrace(name="test", log_dir="/tmp")
 r.log(summary="this is a test", data={"metric": 100})
 r.flush(summary="this will flush right after the write", data={"metric": 101})
 r.close()
+
+# TODO: test write after close throws error
+
+# Test 'RunTraceLog'
+
+fs = StubFS()
+r = runs.RunTrace(name="test", fs=fs)
+r.log(summary="this is a test", data={"metric": 100})
+r.flush(summary="this will flush right after the write", data={"metric": 101})
+r.flush(summary="this will flush right after the write", data={"metric": 102})
+r.close()
+fname = list(fs.files.keys())[0]
+log = runs.RunTraceLog(fname, fs=fs)
