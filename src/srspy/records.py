@@ -46,8 +46,8 @@ class LogEntry:
             self.uuid = uuidpkg.UUID(j["UUID"])
         if "Summary" in j:
             self.summary = j["Summary"]
-        if "Data" in j:
-            self.data = json.loads(j["Data"])
+        if "DataJSON" in j:
+            self.data = json.loads(j["DataJSON"])
 
     def to_json(self) -> dict:
         j: dict = {}
@@ -59,4 +59,4 @@ class LogEntry:
         j["Time"] = self.time.isoformat()
         j["UUID"] = str(self.uuid)
         j["Summary"] = self.summary
-        j["Data"] = json.dumps(self.data)
+        j["DataJSON"] = json.dumps(self.data)
