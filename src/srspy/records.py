@@ -22,14 +22,18 @@ LogEntryLog: LogEntryType = "log"
 LogEntryClose: LogEntryType = "close"
 
 
-# simple dataclass in the style of spinpy
 @dataclasses.dataclass
 class LogEntry:
+    """
+    LogEntry is struct-like class for log entries.
+
+    Note: the field data below is serialized to 'DataJSON'.
+    """
     type: LogEntryType = LogEntryUnknown
     time: datetime.datetime = ZeroTime
     uuid: uuidpkg.UUID = ZeroUUID
     summary: str = ""
-    data: dict = dataclasses.field(default_factory=dict)  # json, why not
+    data: dict = dataclasses.field(default_factory=dict)
 
     @staticmethod
     def from_json(j: dict) -> "LogEntry":
