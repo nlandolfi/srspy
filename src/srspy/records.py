@@ -1,8 +1,7 @@
-# simple logging for experiment runs; see tests/*.py for examples
 import dataclasses
 import datetime
 import json
-import uuid as uuidpkg
+import uuid as uuidpkg  # to avoid conflict with uuid type annotation below
 
 from dateutil.parser import isoparse
 
@@ -14,7 +13,7 @@ ZeroTime: datetime.datetime = datetime.datetime(
 # ZeroUUID is the zero UUID used for UUID types.
 ZeroUUID: uuidpkg.UUID = uuidpkg.UUID(int=0)
 
-# A helper type for the LogEntryType enum.
+# A helper enum type; see values below.
 LogEntryType = str
 
 # Various values for LogEntryType
@@ -23,14 +22,19 @@ LogEntryLog: LogEntryType = "log"
 LogEntryClose: LogEntryType = "close"
 
 
-# simple dataclass in the style of spinpy
 @dataclasses.dataclass
 class LogEntry:
+    """
+    LogEntry is a struct-like class for serializing log entries.
+
+    Note: the `data` field below is serialized to 'DataJSON'.
+    """
+
     type: LogEntryType = LogEntryUnknown
     time: datetime.datetime = ZeroTime
     uuid: uuidpkg.UUID = ZeroUUID
     summary: str = ""
-    data: dict = dataclasses.field(default_factory=dict)  # json, why not
+    data: dict = dataclasses.field(default_factory=dict)
 
     @staticmethod
     def from_json(j: dict) -> "LogEntry":
@@ -47,8 +51,8 @@ class LogEntry:
             self.uuid = uuidpkg.UUID(j["UUID"])
         if "Summary" in j:
             self.summary = j["Summary"]
-        if "Data" in j:
-            self.data = json.loads(j["Data"])
+        if "DataJSON" in j:
+            self.data = json.loads(j["DataJSON"])
 
     def to_json(self) -> dict:
         j: dict = {}
@@ -60,4 +64,4 @@ class LogEntry:
         j["Time"] = self.time.isoformat()
         j["UUID"] = str(self.uuid)
         j["Summary"] = self.summary
-        j["Data"] = json.dumps(self.data)
+        j["DataJSON"] = json.dumps(self.data)

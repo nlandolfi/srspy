@@ -3,7 +3,11 @@ import uuid
 
 from srspy import records
 
+<<<<<<< HEAD
 print("THIS IS SMOKE TEST 1: IT TESTS records")
+=======
+print("THIS IS SMOKE TEST 1: IT TESTS records.py")
+>>>>>>> main
 
 # Test zero types
 assert records.ZeroTime
@@ -29,7 +33,7 @@ json_dict = {
     "Time": "0001-01-01T00:00:00+00:00",
     "UUID": "00000000-0000-0000-0000-000000000000",
     "Summary": "",
-    "Data": "{}",
+    "DataJSON": "{}",
 }
 
 assert entry.to_json() == json_dict
@@ -60,12 +64,13 @@ entry = records.LogEntry(
     },
 )
 
+
 json_dict = {
     "Type": "log",
     "Time": "2023-01-01T03:03:00+00:00",
     "UUID": "47d84f08-eac2-42b1-9569-740c88f4069a",
     "Summary": "This is a summary! \n with new lines",
-    "Data": '{"here is": "some data", "and that": {"is neat": 123}}',
+    "DataJSON": '{"here is": "some data", "and that": {"is neat": 123}}',
 }
 
 assert entry.to_json() == json_dict
