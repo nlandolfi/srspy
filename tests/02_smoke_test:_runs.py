@@ -73,6 +73,13 @@ class StubFS(object):
         return file
 
 
+fs = StubFS()
+assert len(f.files) == 0
+f.open("one", "wb")
+f.open("two", "wb")
+assert len(f.files) == 2
+
+
 with pytest.raises(ValueError):
     runs.RunTrace()  # lacks name
 
