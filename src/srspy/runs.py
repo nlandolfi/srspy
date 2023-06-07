@@ -17,7 +17,6 @@ def now_str():
     we can use as a path (e.g., it has no spaces).
 
     This function is a helper to `RunTrace.__init__` below
-
     """
     return str(datetime.datetime.now()).replace(" ", "_")
 
