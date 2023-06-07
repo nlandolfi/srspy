@@ -11,6 +11,7 @@ assert runs.DEFAULT_LOG_DIR
 assert runs.now_str()
 assert " " not in runs.now_str()  # doesn't have spaces
 
+assert runs.File
 assert runs.FS
 assert runs.LocalFS
 assert runs.LocalFS.open("/dev/null")  # basic open
