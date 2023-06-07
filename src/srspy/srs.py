@@ -1,65 +1,15 @@
 # simple logging for experiment runs; see tests/*.py for examples
-from typing import Any
-import dataclasses
+from typing import IO
 import datetime
 import json
 import os
 import uuid as uuidpkg
 
-from dateutil.parser import isoparse
 
-# ZeroTime is the zero time used by default for spin types.
-ZeroTime = datetime.datetime(1, 1, 1, 0, 0, tzinfo=datetime.timezone.utc)
-
-ZeroUUID = uuidpkg.UUID(int=0)
-
-LogEntryType = str
-
-LogEntryUnknown = ""
-LogEntryLog = "log"
-LogEntryClose = "close"
-
-
-# simple dataclass in the style of spinpy
-@dataclasses.dataclass
-class LogEntry:
-    type: LogEntryType = LogEntryUnknown
-    time: datetime.datetime = ZeroTime
-    uuid: uuidpkg.UUID = ZeroUUID
-    summary: str = ""
-    data: dict = dataclasses.field(default_factory=dict)  # json, why not
-
-    @staticmethod
-    def from_json(j: dict):
-        return LogEntry().unmarshal_json(j)
-
-    def unmarshal_json(self, j: dict):
-        if "Type" in j:
-            self.type = LogEntryType(j["Type"])
-        if "Time" in j:
-            self.time = isoparse(j["Time"])
-        if "UUID" in j:
-            self.uuid = uuidpkg.UUID(j["UUID"])
-        if "Summary" in j:
-            self.summary = j["Summary"]
-        if "Data" in j:
-            self.data = json.loads(j["Data"])
-
-    def to_json(self):
-        j = {}
-        self.marshal_json(j)
-        return j
-
-    def marshal_json(self, j: dict):
-        j["Type"] = self.type
-        j["Time"] = self.time.isoformat()
-        j["UUID"] = str(self.uuid)
-        j["Summary"] = self.summary
-        j["Data"] = json.dumps(self.data)
-
+from .log_entry import LogEntry, LogEntryLog, LogEntryClose
 
 # default dir to use; override via RunTrace(..., log_dir=<here>, ...)
-LOG_DIR = "../runs/"
+DEFAULT_LOG_DIR: str = "../runs/"
 
 
 # get the time as a string that we can use as a path (no spaces)
@@ -89,7 +39,7 @@ class RunTraceLog(object):
 class RunTrace(object):
     closed: bool = False
     name: str
-    log_file: Any  # file
+    log_file: IO[bytes]  # file
 
     def __init__(self, name=None, data={}, log_dir=None, fs=None, verbose=False):
         if name is None:
@@ -98,7 +48,7 @@ class RunTrace(object):
 
         # log directory
         if log_dir is None:
-            log_dir = LOG_DIR
+            log_dir = DEFAULT_LOG_DIR
         self.log_dir = log_dir
 
         self.log_file_path = os.path.join(self.log_dir, f"{name}_{now_str()}.json")
