@@ -1,5 +1,5 @@
 # simple logging for experiment runs; see tests/*.py for examples
-from typing import IO
+from typing import IO, Protocol
 import datetime
 import json
 import os
@@ -8,7 +8,7 @@ import uuid
 from .records import LogEntry, LogEntryType, LogEntryLog, LogEntryClose
 
 # default dir to use; override via RunTrace(..., log_dir=<here>, ...)
-DEFAULT_LOG_DIR: str = "../runs/"
+DEFAULT_LOG_DIR: str = "./runs/"
 
 
 def now_str():
@@ -21,36 +21,47 @@ def now_str():
     return str(datetime.datetime.now()).replace(" ", "_")
 
 
-# load a log which has _already_ been written
-class RunTraceLog(object):
-    def __init__(self, path):
-        self.path = path
-        self.entries = []
+# A type-hint interface for file system methods required.
+class FS(Protocol):
+    def open(self, name: str, mode: str = "wb") -> IO[bytes]:
+        ...
 
-        with open(self.path, "r") as file:
-            for line in file:
-                j = json.loads(line)
-                self.entries.append(LogEntry.from_json(j))
 
-    def metric(self, name: str):
-        out = []
-        for entry in self.entries:
-            if name in entry.data:
-                out.append(entry.data[name])
-        return out
+# A type-hint interface for file system methods required.
+class File(Protocol):
+    def write(self, bytes):
+        ...
+
+    def flush(self):
+        ...
+
+    def close(self):
+        ...
+
+
+# An implementation of `FS` for the local file system.
+class LocalFS(object):
+    @staticmethod
+    def open(name: str, mode: str = "wb"):
+        return open(name, mode)
 
 
 class RunTrace(object):
+    """
+    RunTrace is a class for logging information about an experiment run.
+    """
+
+    _fs: FS
     closed: bool = False
     name: str
-    log_file: IO[bytes]  # e.g. local file, file-like, spin file
+    log_file: File  # e.g. local file, file-like, spin file
 
     def __init__(
         self,
         name: str = "",
         log_dir: str = "",
         data: dict = {},
-        fs=None,
+        fs: FS = LocalFS(),
         verbose=False,
     ):
         if name == "":
@@ -67,13 +78,8 @@ class RunTrace(object):
         if verbose:
             print(f"RunTrace.init at path: {self.log_file_path}")
 
-        if fs is None:
-            o = open
-        else:
-            o = fs.open
-
-        self.log_file = o(self.log_file_path, "wb")
-
+        self._fs = fs
+        self.log_file = fs.open(self.log_file_path, "wb")
         self.log(summary=f"{name} {now_str()}", data=data)
 
     def log(self, summary: str = "", data: dict = {}, type: LogEntryType = LogEntryLog):
