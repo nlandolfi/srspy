@@ -113,6 +113,7 @@ class RunTrace(object):
 
         if summary != "" or data != {}:
             self.log(summary=summary, data=data, type=LogEntryClose)
+
         self.log_file.flush()
         self.log_file.close()
         self.closed = True
