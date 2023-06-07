@@ -1,6 +1,6 @@
 from srspy import srs
 
-print("THIS IS SMOKE TEST 1: IT TESTS basics")
+print("THIS IS SMOKE TEST 2: IT TESTS basics")
 
 r = srs.RunTrace(name="test", log_dir="/tmp")
 r.log(summary="this is a test", data={"metric": 100})
