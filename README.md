@@ -21,7 +21,7 @@ r = srs.RunTrace(name="train_model", data={
     "lr": 0.0001,
     "gpu": GPU,
     "bias": bias,
-}, log_dir="/runs")
+}, log_dir="./runs")
 
 # ...
 
