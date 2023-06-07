@@ -65,7 +65,7 @@ class RunTrace(object):
         verbose=False,
     ):
         if name == "":
-            raise ValueError("RunTrace.init: name must be set")
+            raise ValueError("RunTrace.init: must provide keyword argument `name`")
         self.name = name
 
         if log_dir == "":
