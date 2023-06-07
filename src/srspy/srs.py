@@ -6,7 +6,7 @@ import os
 import uuid as uuidpkg
 
 
-from .log_entry import LogEntry, LogEntryLog, LogEntryClose
+from .records import LogEntry, LogEntryLog, LogEntryClose
 
 # default dir to use; override via RunTrace(..., log_dir=<here>, ...)
 DEFAULT_LOG_DIR: str = "../runs/"

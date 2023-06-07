@@ -33,8 +33,10 @@ class LogEntry:
     data: dict = dataclasses.field(default_factory=dict)  # json, why not
 
     @staticmethod
-    def from_json(j: dict):
-        return LogEntry().unmarshal_json(j)
+    def from_json(j: dict) -> "LogEntry":
+        entry = LogEntry()
+        entry.unmarshal_json(j)
+        return entry
 
     def unmarshal_json(self, j: dict):
         if "Type" in j:
@@ -48,8 +50,8 @@ class LogEntry:
         if "Data" in j:
             self.data = json.loads(j["Data"])
 
-    def to_json(self):
-        j = {}
+    def to_json(self) -> dict:
+        j: dict = {}
         self.marshal_json(j)
         return j
 
