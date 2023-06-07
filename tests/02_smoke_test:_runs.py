@@ -26,12 +26,13 @@ class StubFile(object):
     buffer: IO
 
     def __init__(self, mode: str):
+        if "w" not in mode:
+            raise ValueError("StubFile: mode not writable")
+
         self.mode = mode
         self.buffer = io.BytesIO()
 
     def write(self, bs: bytes):
-        if "w" not in self.mode:
-            raise Exception("StubFile: mode not writable")
         if self.closed:
             raise Exception("StubFile: write on closed file")
 
@@ -44,6 +45,20 @@ class StubFile(object):
 
     def close(self):
         self.closed = True
+
+
+with pytest.raises(ValueError):
+    StubFile("asdf")  # mode does not have w
+
+with pytest.raises(Exception):
+    f = StubFile("wb")
+    assert f.closed
+    f.write()  # file closed
+
+assert StubFile("wb").flushed
+
+f = StubFile("wb")
+f.write(b"asdf")
 
 
 class StubFS(object):
