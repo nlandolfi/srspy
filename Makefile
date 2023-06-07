@@ -18,6 +18,7 @@ types:
 test:
 	python tests/01_smoke_test:_records.py
 	python tests/02_smoke_test:_runs.py
+	python tests/03_smoke_test:_srspy.py
 freeze:
 	pip freeze > requirements.txt
 
