@@ -3,7 +3,7 @@ import uuid
 
 from srspy import records
 
-print("THIS IS SMOKE TEST 1: IT TESTS records")
+print("THIS IS SMOKE TEST 1: IT TESTS records.py")
 
 # Test zero types
 assert records.ZeroTime
