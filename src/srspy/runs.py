@@ -122,7 +122,7 @@ class RunTrace(object):
 
 class RunTraceLog(object):
     """
-    'RunTraceLog' is a helper class to load into memory an entire 'RunTrace' 
+    'RunTraceLog' is a helper class to load into memory an entire 'RunTrace'
     log which has *already* been written.
     """
 
@@ -140,9 +140,9 @@ class RunTraceLog(object):
 
     def metric(self, name: str) -> Tuple[List[Any], List[datetime.datetime]]:
         """
-        Get a metric list. Looks over all entries, and if they
-        have the metric identified by 'name', then it is appended
-        to the list.
+        Get a metric list and timestamps. Looks over all entries, including
+        the first, and if they have the metric identified by 'name', then that
+        metric's value and its 'time' are appended to the lists to be returned.
         """
         out = []
         times = []
