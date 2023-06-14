@@ -42,8 +42,8 @@ class File(Protocol):
 # An implementation of `FS` for the local file system.
 class LocalFS(object):
     @staticmethod
-    def open(name: str, mode: str = "wb", encoding: str = "utf-8"):
-        return open(name, mode)
+    def open(path: str, mode: str = "wb", encoding: str = "utf-8"):
+        return open(path, mode)
 
 
 class RunTrace(object):
