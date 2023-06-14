@@ -60,6 +60,7 @@ class StubFile(object):
     def __iter__(self):
         # overkill, but works for now
         cb = copy.deepcopy(self.buffer)
+        # seek to beginning of buffer
         cb.seek(0)
         return cb
 
