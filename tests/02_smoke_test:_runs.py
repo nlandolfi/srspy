@@ -1,3 +1,4 @@
+import copy
 import pytest
 import io
 
@@ -57,7 +58,10 @@ class StubFile(object):
         self.close()
 
     def __iter__(self):
-        return self.buffer
+        # overkill, but works for now
+        cb = copy.deepcopy(self.buffer)
+        cb.seek(0)
+        return cb
 
 
 with pytest.raises(ValueError):
@@ -142,6 +146,35 @@ r.flush(summary="this will flush right after the write", data={"metric": 102})
 r.close()
 fname = r.log_file_path
 log = runs.RunTraceLog(fname)
+assert log.path == fname
+assert len(log.entries) == 4
+assert "test NAME" in log.entries[0].summary
+assert log.entries[1].summary == "this is a test"
+assert log.entries[2].data["metric"] == 101
+assert log.entries[3].data["metric"] == 102
+ms, ts = log.metric("metric")
+assert len(ms) == 3
+assert ms[0] == 100
+assert ms[1] == 101
+assert ms[2] == 102
+assert ts[0] < ts[1]
+assert ts[1] < ts[2]
+
+## use the stubbed file system
+fs = StubFS()
+r = runs.RunTrace(name="test NAME", fs=fs)
+r.log(summary="this is a test", data={"metric": 100})
+r.flush(summary="this will flush right after the write", data={"metric": 101})
+r.flush(summary="this will flush right after the write", data={"metric": 102})
+r.close()
+
+fname = list(fs.files.keys())[0]
+assert fs.open(fname, "r")
+assert len(fs.open(fname, "r").buffer.getvalue()) > 0
+
+log = runs.RunTraceLog(fname, fs=fs)
+# the following asserts are the same as the above, copied
+# for convenience for now
 assert log.path == fname
 assert len(log.entries) == 4
 assert "test NAME" in log.entries[0].summary

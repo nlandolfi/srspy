@@ -80,7 +80,7 @@ class RunTrace(object):
             print(f"RunTrace.init at path: {self.log_file_path}")
 
         self._fs = fs
-        self.log_file = self._fs.open(self.log_file_path, "wb")
+        self.log_file = self._fs.open(self.log_file_path, "wb", encoding="utf-8")
         self.log(summary=f"{name} {now_str()}", data=data)
 
     def log(self, summary: str = "", data: dict = {}, type: LogEntryType = LogEntryLog):
