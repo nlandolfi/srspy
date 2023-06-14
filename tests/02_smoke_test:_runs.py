@@ -175,8 +175,7 @@ assert fs.open(fname, "r")
 assert len(fs.open(fname, "r").buffer.getvalue()) > 0
 
 log = runs.RunTraceLog(fname, fs=fs)
-# the following asserts are the same as the above, copied
-# for convenience for now
+# the following asserts are copied from those used above
 assert log.path == fname
 assert len(log.entries) == 4
 assert "test NAME" in log.entries[0].summary
