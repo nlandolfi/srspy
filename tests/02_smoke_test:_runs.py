@@ -115,6 +115,10 @@ r.log(summary="this is a test", data={"metric": 100})
 r.flush(summary="this will flush right after the write", data={"metric": 101})
 r.close()
 
+# test that writing after close throws an error
+with pytest.raises(Exception):
+    r.log(summary="closed file")
+
 assert len(fs.files) == 1
 fname = list(fs.files.keys())[0]
 assert " " not in fname
@@ -135,6 +139,7 @@ r.log(summary="this is a test", data={"metric": 100})
 r.flush(summary="this will flush right after the write", data={"metric": 101})
 r.close()
 
+# test that writing after close throws an error
 with pytest.raises(Exception):
     r.log(summary="closed file")
 
