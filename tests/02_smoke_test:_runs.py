@@ -134,7 +134,8 @@ r.log(summary="this is a test", data={"metric": 100})
 r.flush(summary="this will flush right after the write", data={"metric": 101})
 r.close()
 
-# TODO: test write after close throws error
+with pytest.raises(Exception):
+    r.log(summary="closed file")
 
 # Test 'RunTraceLog'
 
