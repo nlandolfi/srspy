@@ -129,11 +129,11 @@ class RunTraceLog(object):
     path: str
     entries: List[LogEntry]
 
-    def __init__(self, path, fs: FS = LocalFS):
+    def __init__(self, path: str, fs: FS = LocalFS):
         self.path = path
         self.entries = []
 
-        with fs.open(self.path, "r", encoding="utf-8") as file:
+        with fs.open(self.path, mode="r", encoding="utf-8") as file:
             for line in file:
                 j = json.loads(line)
                 self.entries.append(LogEntry.from_json(j))
