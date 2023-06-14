@@ -140,7 +140,7 @@ class RunTraceLog(object):
 
     def metric(self, name: str) -> Tuple[List[Any], List[datetime.datetime]]:
         """
-        Get a metric list and their corresponding timestamps.
+        Get a metric list and corresponding timestamps.
 
         Looks over all entries, including the first. If an entry has the 'name'
         in its 'data', then the value associated with name and the 'time'
