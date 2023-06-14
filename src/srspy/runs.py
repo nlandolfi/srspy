@@ -122,8 +122,8 @@ class RunTrace(object):
 
 class RunTraceLog(object):
     """
-    'RunTraceLog' is a helper class to load into memory an
-    entire 'RunTrace' log which has *already* been written.
+    'RunTraceLog' is a helper class to load into memory an entire 'RunTrace' 
+    log which has *already* been written.
     """
 
     path: str
