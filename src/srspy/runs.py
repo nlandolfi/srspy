@@ -1,5 +1,5 @@
 # simple logging for experiment runs; see tests/*.py for examples
-from typing import IO, List, Protocol
+from typing import Any, IO, List, Protocol, Tuple
 import datetime
 import json
 import os
@@ -23,7 +23,7 @@ def now_str():
 
 # A type-hint interface for a file system.
 class FS(Protocol):
-    def open(self, name: str, mode: str = "wb") -> IO[bytes]:
+    def open(self, path: str, mode: str = "wb", encoding: str = "utf-8") -> IO[bytes]:
         ...
 
 
@@ -42,7 +42,7 @@ class File(Protocol):
 # An implementation of `FS` for the local file system.
 class LocalFS(object):
     @staticmethod
-    def open(name: str, mode: str = "wb"):
+    def open(name: str, mode: str = "wb", encoding: str = "utf-8"):
         return open(name, mode)
 
 
@@ -133,16 +133,21 @@ class RunTraceLog(object):
         self.path = path
         self.entries = []
 
-        with fs.open(self.path, "r") as file:
-            print(f"in open, file={file}")
+        with fs.open(self.path, "r", encoding="utf-8") as file:
             for line in file:
-                print(f"in loop, line={line.decode('utf-8')}")
                 j = json.loads(line)
                 self.entries.append(LogEntry.from_json(j))
 
-    def metric(self, name: str):
+    def metric(self, name: str) -> Tuple[List[Any], List[datetime.datetime]]:
+        """
+        Get a metric list. Looks over all entries, and if they
+        have the metric identified by 'name', then it is appended
+        to the list.
+        """
         out = []
+        times = []
         for entry in self.entries:
             if name in entry.data:
                 out.append(entry.data[name])
-        return out
+                times.append(entry.time)
+        return out, times
