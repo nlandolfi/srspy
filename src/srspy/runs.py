@@ -143,7 +143,7 @@ class RunTraceLog(object):
         Get a metric list and corresponding timestamps.
 
         Looks over all entries, including the first. If an entry has the 'name'
-        in its 'data', then the value associated with name and the 'time'
+        in its 'data', then the value associated with 'name' and the 'time'
         associated with the entry are appended to lists returned to the caller.
         """
         out = []
