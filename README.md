@@ -32,4 +32,8 @@ for epoch in ...:
 
 # ...
 r.close()
+
+# later
+l = RunTraceLog(r.log_file_path)
+losses, timestamps = l.metric("epoch_loss")
 ```
