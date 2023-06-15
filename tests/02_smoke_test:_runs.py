@@ -35,7 +35,6 @@ class StubFile(object):
 
         self.mode = mode
         self.buffer = io.BytesIO()
-        self.name = "food"
 
     def write(self, bs: bytes):
         if self.closed:
