@@ -122,6 +122,11 @@ r.close()
 with pytest.raises(Exception):
     r.log(summary="closed file")
 
+# shouldn't be able to loop
+with pytest.raises(Exception):
+    for x in r.log_file:
+        print(x)
+
 assert len(fs.files) == 1
 fname = list(fs.files.keys())[0]
 assert " " not in fname
