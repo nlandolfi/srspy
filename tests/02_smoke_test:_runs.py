@@ -1,6 +1,6 @@
+import copy
 import pytest
 import io
-from typing import IO
 
 from srspy import runs
 
@@ -27,7 +27,7 @@ class StubFile(object):
     mode: str
     closed: bool = False
     flushed: bool = True
-    buffer: IO
+    buffer: io.BytesIO
 
     def __init__(self, mode: str):
         if "w" not in mode:
@@ -49,6 +49,18 @@ class StubFile(object):
 
     def close(self):
         self.closed = True
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def __iter__(self):
+        if self.closed:
+            raise Exception("StubFile: __iter__ on closed file")
+
+        return self.buffer
 
 
 with pytest.raises(ValueError):
@@ -74,7 +86,15 @@ class StubFS(object):
     def __init__(self):
         self.files = {}
 
-    def open(self, path, mode):
+    def open(self, path: str, mode: str = "wb", encoding: str = "utf-8"):
+        if path in self.files:
+            c = copy.deepcopy(self.files[path])
+            c.closed = False
+            c.flushed = False
+            c.mode = mode
+            c.buffer.seek(0)
+            return c
+
         file = StubFile(mode)
         self.files[path] = file
         return file
@@ -98,6 +118,15 @@ r.log(summary="this is a test", data={"metric": 100})
 r.flush(summary="this will flush right after the write", data={"metric": 101})
 r.close()
 
+# test that writing after close throws an error
+with pytest.raises(Exception):
+    r.log(summary="closed file")
+
+# shouldn't be able to iterate on closed file
+with pytest.raises(Exception):
+    for x in r.log_file:
+        print(x)
+
 assert len(fs.files) == 1
 fname = list(fs.files.keys())[0]
 assert " " not in fname
@@ -117,3 +146,59 @@ r = runs.RunTrace(name="test", log_dir="/tmp")
 r.log(summary="this is a test", data={"metric": 100})
 r.flush(summary="this will flush right after the write", data={"metric": 101})
 r.close()
+
+# test that writing after close throws an error
+with pytest.raises(Exception):
+    r.log(summary="closed file")
+
+# Test 'RunTraceLog'
+
+## use local filesystem
+r = runs.RunTrace(name="test NAME", log_dir="/tmp")
+r.log(summary="this is a test", data={"metric": 100})
+r.flush(summary="this will flush right after the write", data={"metric": 101})
+r.flush(summary="this will flush right after the write", data={"metric": 102})
+r.close()
+fname = r.log_file_path
+log = runs.RunTraceLog(fname)
+assert log.path == fname
+assert len(log.entries) == 4
+assert "test NAME" in log.entries[0].summary
+assert log.entries[1].summary == "this is a test"
+assert log.entries[2].data["metric"] == 101
+assert log.entries[3].data["metric"] == 102
+ms, ts = log.metric("metric")
+assert len(ms) == 3
+assert ms[0] == 100
+assert ms[1] == 101
+assert ms[2] == 102
+assert ts[0] < ts[1]
+assert ts[1] < ts[2]
+
+## use the stubbed file system
+fs = StubFS()
+r = runs.RunTrace(name="test NAME", fs=fs)
+r.log(summary="this is a test", data={"metric": 100})
+r.flush(summary="this will flush right after the write", data={"metric": 101})
+r.flush(summary="this will flush right after the write", data={"metric": 102})
+r.close()
+
+fname = list(fs.files.keys())[0]
+assert fs.open(fname, "r")
+assert len(fs.open(fname, "r").buffer.getvalue()) > 0
+
+log = runs.RunTraceLog(fname, fs=fs)
+# the following asserts are copied from those used above
+assert log.path == fname
+assert len(log.entries) == 4
+assert "test NAME" in log.entries[0].summary
+assert log.entries[1].summary == "this is a test"
+assert log.entries[2].data["metric"] == 101
+assert log.entries[3].data["metric"] == 102
+ms, ts = log.metric("metric")
+assert len(ms) == 3
+assert ms[0] == 100
+assert ms[1] == 101
+assert ms[2] == 102
+assert ts[0] < ts[1]
+assert ts[1] < ts[2]

@@ -1,5 +1,5 @@
 # simple logging for experiment runs; see tests/*.py for examples
-from typing import IO, Protocol
+from typing import Any, IO, List, Protocol, Tuple
 import datetime
 import json
 import os
@@ -23,7 +23,7 @@ def now_str():
 
 # A type-hint interface for a file system.
 class FS(Protocol):
-    def open(self, name: str, mode: str = "wb") -> IO[bytes]:
+    def open(self, path: str, mode: str = "wb", encoding: str = "utf-8") -> IO[bytes]:
         ...
 
 
@@ -42,8 +42,8 @@ class File(Protocol):
 # An implementation of `FS` for the local file system.
 class LocalFS(object):
     @staticmethod
-    def open(name: str, mode: str = "wb"):
-        return open(name, mode)
+    def open(path: str, mode: str = "wb", encoding: str = "utf-8"):
+        return open(path, mode)
 
 
 class RunTrace(object):
@@ -54,6 +54,7 @@ class RunTrace(object):
     _fs: FS
     closed: bool = False
     name: str
+    log_file_path: str
     log_file: File  # e.g. local file, file-like, spin file
 
     def __init__(
@@ -79,7 +80,7 @@ class RunTrace(object):
             print(f"RunTrace.init at path: {self.log_file_path}")
 
         self._fs = fs
-        self.log_file = self._fs.open(self.log_file_path, "wb")
+        self.log_file = self._fs.open(self.log_file_path, "wb", encoding="utf-8")
         self.log(summary=f"{name} {now_str()}", data=data)
 
     def log(self, summary: str = "", data: dict = {}, type: LogEntryType = LogEntryLog):
@@ -117,3 +118,38 @@ class RunTrace(object):
         self.log_file.flush()
         self.log_file.close()
         self.closed = True
+
+
+class RunTraceLog(object):
+    """
+    'RunTraceLog' is a helper class for loading into memory an entire 'RunTrace'
+    log which has *already* been written.
+    """
+
+    path: str
+    entries: List[LogEntry]
+
+    def __init__(self, path: str, fs: FS = LocalFS):
+        self.path = path
+        self.entries = []
+
+        with fs.open(self.path, mode="r", encoding="utf-8") as file:
+            for line in file:
+                j = json.loads(line)
+                self.entries.append(LogEntry.from_json(j))
+
+    def metric(self, name: str) -> Tuple[List[Any], List[datetime.datetime]]:
+        """
+        Get a metric list and corresponding timestamps.
+
+        Looks over all entries, including the first. If an entry has the 'name'
+        in its 'data', then the value associated with 'name' and the 'time'
+        associated with the entry are appended to lists returned to the caller.
+        """
+        out = []
+        times = []
+        for entry in self.entries:
+            if name in entry.data:
+                out.append(entry.data[name])
+                times.append(entry.time)
+        return out, times
