@@ -57,11 +57,10 @@ class StubFile(object):
         self.close()
 
     def __iter__(self):
-        # possibly overkill, but works for now
-        cb = copy.deepcopy(self.buffer)
-        # seek to beginning of buffer
-        cb.seek(0)
-        return cb
+        if self.closed:
+            raise Exception("StubFile: __iter__ on closed file")
+
+        return self.buffer
 
 
 with pytest.raises(ValueError):
@@ -89,7 +88,12 @@ class StubFS(object):
 
     def open(self, path: str, mode: str = "wb", encoding: str = "utf-8"):
         if path in self.files:
-            return self.files[path]
+            c = copy.deepcopy(self.files[path])
+            c.closed = False
+            c.flushed = False
+            c.mode = mode
+            c.buffer.seek(0)
+            return c
 
         file = StubFile(mode)
         self.files[path] = file
