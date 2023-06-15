@@ -122,7 +122,7 @@ r.close()
 with pytest.raises(Exception):
     r.log(summary="closed file")
 
-# shouldn't be able to loop
+# shouldn't be able to iterate on closed file
 with pytest.raises(Exception):
     for x in r.log_file:
         print(x)
