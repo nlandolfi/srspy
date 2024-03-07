@@ -23,20 +23,18 @@ def now_str():
 
 # A type-hint interface for a file system.
 class FS(Protocol):
-    def open(self, path: str, mode: str = "wb", encoding: str = "utf-8") -> IO[bytes]:
-        ...
+    def open(
+        self, path: str, mode: str = "wb", encoding: str = "utf-8"
+    ) -> IO[bytes]: ...
 
 
 # A type-hint interface for a file.
 class File(Protocol):
-    def write(self, b: bytes):
-        ...
+    def write(self, b: bytes): ...
 
-    def flush(self):
-        ...
+    def flush(self): ...
 
-    def close(self):
-        ...
+    def close(self): ...
 
 
 # An implementation of `FS` for the local file system.
