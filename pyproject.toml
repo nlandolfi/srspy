@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 [project]
 name = "srspy"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
   { name = "N. C. Landolfi", email="crews.fixture.0f@icloud.com"},
 ]
@@ -11,7 +11,8 @@ description = "A package for simple experiment run tracing."
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
-  "numpy", 
+  "numpy",
+  "python-dateutil",
 ]
 classifiers = [
   "Programming Language :: Python :: 3",

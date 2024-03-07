@@ -12,7 +12,7 @@ install:
 fmt:
 	python -m black .
 lint:
-	python -m ruff .
+	python -m ruff check .
 types:
 	mypy src
 test:
