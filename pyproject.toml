@@ -21,4 +21,4 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/nlandolfi/srspy"
+"Homepage" = "https://github.com/nclando/srspy"
